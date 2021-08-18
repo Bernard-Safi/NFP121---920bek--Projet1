@@ -20,14 +20,16 @@ public class TeacherHelper {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-            UserCreationGui userCreation=new UserCreationGui();
-            userCreation.setVisible(true);
-        try {
-            
-            JdbcSingleton.getInstance().insert("bernard", "safi","03/145233","ViSion", "Password:123456789", "Admin");
-        } catch (SQLException ex) {
-            Logger.getLogger(TeacherHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        LoginGui login=new LoginGui();
+        login.setVisible(true);
+//            AdminGui userCreation=new AdminGui();
+//            userCreation.setVisible(true);
+//        try {
+//            
+//            JdbcSingleton.getInstance().insert("bernard", "safi","03/145233","ViSion", "Password:123456789", "Admin");
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TeacherHelper.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
     
 }

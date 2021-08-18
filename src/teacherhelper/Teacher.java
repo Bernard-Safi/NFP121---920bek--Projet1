@@ -10,10 +10,7 @@ package teacherhelper;
  * @author ViSion
  */
 public class Teacher extends User{
-    
-    public Teacher(int id, String name, String lastname, String phone, String username, String password, String userType) {
-        super(id, name, lastname, phone, username, password, userType);
-    }
+
     public Teacher(String name, String lastname, String phone, String username, String password, String userType) {
         super(name, lastname, phone, username, password, userType);
     }

@@ -5,9 +5,13 @@
  */
 package teacherhelper;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 /**
  *
@@ -22,15 +26,6 @@ abstract class User {
     private String password;
     private String userType;
     
-    User(int id,String name,String lastname,String phone,String username,String password,String userType){
-         setId(id);
-         setName(name);
-         setLastName(lastname);
-         setPhone(phone);
-         setUsername(username);
-         setPassword(password);
-         setUserType(userType);
-    }
       User(String name,String lastname,String phone,String username,String password,String userType){
          setName(name);
          setLastName(lastname);
@@ -39,8 +34,13 @@ abstract class User {
          setPassword(password);
          setUserType(userType);
     }
+      
+    public static User userLogin(JTextField username,JPasswordField password,JFrame frame) throws SQLException{
+      return JdbcSingleton.getInstance().validateLogin(username.getText(), new String(password.getPassword()),frame);
+    }
     
-
+    abstract void editProfile();
+    abstract void changePassword();
  
     public int getId(){
         return this.id;
