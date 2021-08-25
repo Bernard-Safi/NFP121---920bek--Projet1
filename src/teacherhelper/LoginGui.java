@@ -19,6 +19,7 @@ public class LoginGui extends javax.swing.JFrame {
      * Creates new form LoginGui
      */
     public LoginGui() {
+        this.setTitle("Login");
         initComponents();
     }
 

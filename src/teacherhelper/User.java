@@ -5,10 +5,7 @@
  */
 package teacherhelper;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -39,12 +36,19 @@ abstract class User {
       return JdbcSingleton.getInstance().validateLogin(username.getText(), new String(password.getPassword()),frame);
     }
     
-    abstract void editProfile();
-    abstract void changePassword();
- 
-    public int getId(){
-        return this.id;
+    public void logout(JFrame frame){
+          frame.dispose();
+          new LoginGui().setVisible(true);
     }
+    public void editProfile(User user,String name,String lastname,String phone,String username,JFrame frame) throws SQLException{
+        JdbcSingleton.getInstance().updateProfile(user, name, lastname, phone, username, frame);
+        
+    }
+    public void changePassword(User user,String password,JFrame frame) throws SQLException{
+        JdbcSingleton.getInstance().updatePassword(user, password, frame);
+    }
+ 
+    
     public String getName(){
         return this.name;
     }
@@ -63,6 +67,10 @@ abstract class User {
     public String getUserType(){
         return this.userType;
     }
+    public int getId(){
+        return this.id;
+    }
+    
     
     public void setId(int id){
         this.id=id;
@@ -86,4 +94,12 @@ abstract class User {
         this.userType=userType;
     }
     
+    
+     public Memento saveStateToMemento(){
+      return new Memento(password);
+   }
+
+   public void getStateFromMemento(Memento memento){
+      password = memento.getState();
+   }
 }
