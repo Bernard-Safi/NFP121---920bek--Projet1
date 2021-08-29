@@ -11,17 +11,14 @@ package teacherhelper;
  */
 public class UserFactory {
 
-    public User getUser(String name, String lastname, String phone, String username, String password, String userType){
-        if(userType == null){
+    public User getUser(String name, String lastname, String phone, String username, String password, String userType) {
+        if (userType == null) {
             return null;
-        }
-        else if(userType.equalsIgnoreCase("admin")){
+        } else if (userType.equalsIgnoreCase("admin")) {
             return new Admin(name, lastname, phone, username, password, userType);
-        }
-        else if(userType.equalsIgnoreCase("teacher")){
+        } else if (userType.equalsIgnoreCase("teacher")) {
             return new Teacher(name, lastname, phone, username, password, userType);
-        }
-        else if(userType.equalsIgnoreCase("student")){
+        } else if (userType.equalsIgnoreCase("student")) {
             return new Student(name, lastname, phone, username, password, userType);
         }
         return null;

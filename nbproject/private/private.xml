@@ -4,15 +4,19 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/User.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/TeacherGui.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/AdminGui.java</file>
-            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/LoginGui.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/UserFactory.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Admin.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/JdbcSingleton.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Subject.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Memento.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/LoginGui.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/CareTaker.java</file>
+            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/StudentGui.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/TeacherHelper.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Student.java</file>
             <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Teacher.java</file>
-            <file>file:/C:/Users/ViSion/Documents/NetBeansProjects/TeacherHelper/src/teacherhelper/Memento.java</file>
         </group>
     </open-files>
 </project-private>

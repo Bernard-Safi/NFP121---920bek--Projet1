@@ -5,6 +5,8 @@
  */
 package teacherhelper;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author ViSion
@@ -15,5 +17,16 @@ public class Student extends User {
         super(name, lastname, phone, username, password, userType);
     }
 
-    
+    public void SubjectChoice(int userId, int subjectId) throws SQLException {
+        JdbcSingleton.getInstance().chooseSubject(userId, subjectId);
+    }
+
+    public void subjectRemove(int userId, int subjectId, StudentGui studentGui) throws SQLException {
+        JdbcSingleton.getInstance().removeSubject(userId, subjectId, studentGui);
+    }
+
+    public void submitProject(int userId, int projectId, String link) throws SQLException {
+        JdbcSingleton.getInstance().submitProject(userId, projectId, link);
+    }
+
 }

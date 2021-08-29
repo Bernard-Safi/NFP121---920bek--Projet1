@@ -9,17 +9,15 @@ package teacherhelper;
  *
  * @author ViSion
  */
-
 public class Memento {
-    
-   private String password;
 
-   public Memento(String password){
-      this.password = password;
-   }
+    private String password;
 
-   public String getState(){
-      return this.password;
-   }	
+    public Memento(String password) {
+        this.password = password;
+    }
+
+    public String getState() {
+        return this.password;
+    }
 }
-

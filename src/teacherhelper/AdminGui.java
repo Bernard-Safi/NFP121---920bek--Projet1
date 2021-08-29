@@ -5,7 +5,6 @@
  */
 package teacherhelper;
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -24,16 +23,16 @@ public class AdminGui extends javax.swing.JFrame {
     /**
      * Creates new form UserCreationGui
      */
-
     private Admin admin;
     CareTaker careTaker;
+
     public AdminGui(User user) {
-        admin=(Admin)user;
-        careTaker=new CareTaker();
+        admin = (Admin) user;
+        careTaker = new CareTaker();
         careTaker.add(admin.saveStateToMemento());
         initComponents();
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         jTable.setDefaultRenderer(String.class, centerRenderer);
         jTable1.setDefaultRenderer(String.class, centerRenderer);
         jTable.setDefaultEditor(Object.class, null);
@@ -45,13 +44,15 @@ public class AdminGui extends javax.swing.JFrame {
         }
     }
 
-    public void loadView() throws SQLException{
-        jTable.setModel(JdbcSingleton.getInstance().getALLUsers(jTable.getModel(),admin));
+    public void loadView() throws SQLException {
+        jTable.setModel(JdbcSingleton.getInstance().getALLUsers(jTable.getModel(), admin));
     }
-    public void loadSubjectView() throws SQLException{
+
+    public void loadSubjectView() throws SQLException {
         jTable1.setModel(JdbcSingleton.getInstance().getALLSubjects(jTable1.getModel()));
     }
-    public void clear(){
+
+    public void clear() {
         nameTf.setText("");
         lastNameTf.setText("");
         phoneTf.setText("");
@@ -60,19 +61,22 @@ public class AdminGui extends javax.swing.JFrame {
         userTypeCb.setSelectedIndex(0);
         jTable.clearSelection();
     }
-      public void clearSubject(){
+
+    public void clearSubject() {
         subjectNameTf.setText("");
         subjectCreditsCb.setSelectedIndex(0);
     }
-    
-    public boolean allInfoAvailable(){
-        return(!(nameTf.getText().equals("")||lastNameTf.getText().equals("")||phoneTf.getText().equals("")||userNameTf.getText().equals("")||new String(passwordJpf.getPassword()).equals("")));
+
+    public boolean allInfoAvailable() {
+        return (!(nameTf.getText().equals("") || lastNameTf.getText().equals("") || phoneTf.getText().equals("") || userNameTf.getText().equals("") || new String(passwordJpf.getPassword()).equals("")));
     }
-    public boolean subjectNameAvailable(){
+
+    public boolean subjectNameAvailable() {
         return (!subjectNameTf.getText().equals(""));
     }
-    public boolean editInfoAvailable(){
-        return(!(nameTf.getText().equals("")||lastNameTf.getText().equals("")||phoneTf.getText().equals("")||userNameTf.getText().equals("")));
+
+    public boolean editInfoAvailable() {
+        return (!(nameTf.getText().equals("") || lastNameTf.getText().equals("") || phoneTf.getText().equals("") || userNameTf.getText().equals("")));
     }
 
     /**
@@ -741,72 +745,70 @@ public class AdminGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBtnActionPerformed
-      
-        if(allInfoAvailable()){
+
+        if (allInfoAvailable()) {
             try {
-                if(JdbcSingleton.getInstance().searchUser(userNameTf.getText())){
+                if (JdbcSingleton.getInstance().searchUser(userNameTf.getText())) {
                     JOptionPane.showMessageDialog(this, "Username Already Exist Choose Another");
-                }
-                else{
-                    
+                } else {
+
                     admin.addUser(nameTf.getText(), lastNameTf.getText(), phoneTf.getText(), userNameTf.getText(), new String(passwordJpf.getPassword()), userTypeCb.getSelectedItem().toString());
                     JOptionPane.showMessageDialog(this, "User Successfuly Created");
-                    ResultSet rs=JdbcSingleton.getInstance().getUser(userNameTf.getText());
-                    DefaultTableModel model=(DefaultTableModel)jTable.getModel();
-                    while(rs.next()){
-                    model.addRow(new Object[]{rs.getString("id"),rs.getString("name"),rs.getString("lastname"),rs.getString("phone"),
-                    rs.getString("username"),rs.getString("userType")});
+                    ResultSet rs = JdbcSingleton.getInstance().getUser(userNameTf.getText());
+                    DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+                    while (rs.next()) {
+                        model.addRow(new Object[]{rs.getString("id"), rs.getString("name"), rs.getString("lastname"), rs.getString("phone"),
+                            rs.getString("username"), rs.getString("userType")});
                     }
                     clear();
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        else{
+        } else {
             JOptionPane.showMessageDialog(this, "Some Informations are Missing");
         }
     }//GEN-LAST:event_saveBtnActionPerformed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-      if(jTabbedPane1.getSelectedIndex()==1){
-          try {
-              loadSubjectView();
-          } catch (SQLException ex) {
-              Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-          }
+        if (jTabbedPane1.getSelectedIndex() == 1) {
+            try {
+                loadSubjectView();
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-        if(jTabbedPane1.getSelectedIndex()==2){
-          try {
-              
-              ResultSet rs=JdbcSingleton.getInstance().loadProfile(admin);
-              while(rs.next()){
-                  nameEditTf.setText(rs.getString("name"));
-                  lastNameEditTf.setText(rs.getString("lastname"));
-                  phoneEditTf.setText(rs.getString("phone"));
-                  userNameEditTf.setText(rs.getString("username"));
-              }
-          } catch (SQLException ex) {
-              Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-          }
-      }
-      
-        if(jTabbedPane1.getSelectedIndex()==4){
-          admin.logout(this);
-      }
-      
+
+        if (jTabbedPane1.getSelectedIndex() == 2) {
+            try {
+
+                ResultSet rs = JdbcSingleton.getInstance().loadProfile(admin);
+                while (rs.next()) {
+                    nameEditTf.setText(rs.getString("name"));
+                    lastNameEditTf.setText(rs.getString("lastname"));
+                    phoneEditTf.setText(rs.getString("phone"));
+                    userNameEditTf.setText(rs.getString("username"));
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (jTabbedPane1.getSelectedIndex() == 4) {
+            admin.logout(this);
+        }
+
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private void jTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableMouseClicked
-       DefaultTableModel model=(DefaultTableModel)jTable.getModel();
-       int selectedIndex=jTable.getSelectedRow();
-       nameTf.setText(jTable.getValueAt(selectedIndex, 1).toString());
-       lastNameTf.setText(jTable.getValueAt(selectedIndex, 2).toString());
-       phoneTf.setText(jTable.getValueAt(selectedIndex, 3).toString());
-       userNameTf.setText(jTable.getValueAt(selectedIndex, 4).toString());
-       userTypeCb.setSelectedItem(jTable.getValueAt(selectedIndex, 5).toString());
-       passwordJpf.setText("");
+        DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+        int selectedIndex = jTable.getSelectedRow();
+        nameTf.setText(jTable.getValueAt(selectedIndex, 1).toString());
+        lastNameTf.setText(jTable.getValueAt(selectedIndex, 2).toString());
+        phoneTf.setText(jTable.getValueAt(selectedIndex, 3).toString());
+        userNameTf.setText(jTable.getValueAt(selectedIndex, 4).toString());
+        userTypeCb.setSelectedItem(jTable.getValueAt(selectedIndex, 5).toString());
+        passwordJpf.setText("");
     }//GEN-LAST:event_jTableMouseClicked
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
@@ -814,42 +816,40 @@ public class AdminGui extends javax.swing.JFrame {
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
-               if(jTable.getSelectedRow()<0){
-           JOptionPane.showMessageDialog(this,"You Didnt Make A Selection !!");
-       }
-               else{
-        int selectedIndex=jTable.getSelectedRow();
-        try {
-            admin.deleteUser(Integer.parseInt(jTable.getValueAt(selectedIndex, 0).toString()), this);
-            DefaultTableModel model=(DefaultTableModel)jTable.getModel();
-            model.setRowCount(0);
-            loadView();
-            clear();
-        } catch (SQLException ex) {
-            Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+        if (jTable.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable.getSelectedRow();
+            try {
+                admin.deleteUser(Integer.parseInt(jTable.getValueAt(selectedIndex, 0).toString()), this);
+                DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+                model.setRowCount(0);
+                loadView();
+                clear();
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-               }
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
-       if(!editInfoAvailable()||jTable.getSelectedRow()<0){
-           JOptionPane.showMessageDialog(this,"Some Fields Are Missing Or You Didnt Make A Selection !!");
-       }
-       else{
-           int selectedIndex=jTable.getSelectedRow();
-           
-           try {
-               admin.updateUser(Integer.parseInt(jTable.getValueAt(selectedIndex, 0).toString()), nameTf.getText(), lastNameTf.getText(), phoneTf.getText(), userNameTf.getText(), new String(passwordJpf.getPassword()), userTypeCb.getSelectedItem().toString(), this);
+        if (!editInfoAvailable() || jTable.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Some Fields Are Missing Or You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable.getSelectedRow();
 
-               DefaultTableModel model=(DefaultTableModel)jTable.getModel();
-            model.setRowCount(0);
-               loadView();
-               clear();
-               
-           } catch (SQLException ex) {
-               Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-           }
-       }
+            try {
+                admin.updateUser(Integer.parseInt(jTable.getValueAt(selectedIndex, 0).toString()), nameTf.getText(), lastNameTf.getText(), phoneTf.getText(), userNameTf.getText(), new String(passwordJpf.getPassword()), userTypeCb.getSelectedItem().toString(), this);
+
+                DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+                model.setRowCount(0);
+                loadView();
+                clear();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void editProfileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProfileBtnActionPerformed
@@ -865,25 +865,21 @@ public class AdminGui extends javax.swing.JFrame {
     }//GEN-LAST:event_editProfileBtnActionPerformed
 
     private void confirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmBtnActionPerformed
-        if(oldPassTf.getText()==""||newPassTf.getText()==""||confirmPassTf.getText()==""){
+        if (oldPassTf.getText() == "" || newPassTf.getText() == "" || confirmPassTf.getText() == "") {
             JOptionPane.showMessageDialog(this, "Some Fields Are Missing !!");
-        }
-        else{
+        } else {
             try {
-                if(!JdbcSingleton.getInstance().verifyOldPassword(admin, oldPassTf.getText())){
+                if (!JdbcSingleton.getInstance().verifyOldPassword(admin, oldPassTf.getText())) {
                     JOptionPane.showMessageDialog(this, "Wrong Old Password !!");
-                }
-                else{
-                    
-                    if(!newPassTf.getText().equals(confirmPassTf.getText())){
+                } else {
+
+                    if (!newPassTf.getText().equals(confirmPassTf.getText())) {
                         JOptionPane.showMessageDialog(this, "New Pass And Confirmation Are Not The Same !!");
-                    }
-                    else{
+                    } else {
                         admin.changePassword(admin, newPassTf.getText(), this);
                         admin.setPassword(newPassTf.getText());
                         careTaker.add(admin.saveStateToMemento());
-                        
-                        
+
                     }
                 }
             } catch (SQLException ex) {
@@ -893,85 +889,80 @@ public class AdminGui extends javax.swing.JFrame {
     }//GEN-LAST:event_confirmBtnActionPerformed
 
     private void undoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoBtnActionPerformed
-        if(careTaker.getList().size()>1){
+        if (careTaker.getList().size() > 1) {
             try {
-                admin.changePassword(admin,careTaker.get(careTaker.getList().size()-2).getState(), this);
+                admin.changePassword(admin, careTaker.get(careTaker.getList().size() - 2).getState(), this);
             } catch (SQLException ex) {
                 Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            admin.setPassword(careTaker.get(careTaker.getList().size()-2).getState());
-            
-            careTaker.getList().remove(careTaker.getList().size()-1);
-        }
-        else{
+
+            admin.setPassword(careTaker.get(careTaker.getList().size() - 2).getState());
+
+            careTaker.getList().remove(careTaker.getList().size() - 1);
+        } else {
             JOptionPane.showMessageDialog(this, "There Is Nothing To Undo !!");
         }
     }//GEN-LAST:event_undoBtnActionPerformed
 
     private void saveSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveSubjectBtnActionPerformed
-                if(subjectNameAvailable()){
+        if (subjectNameAvailable()) {
             try {
-                if(JdbcSingleton.getInstance().searchSubject(subjectNameTf.getText())){
+                if (JdbcSingleton.getInstance().searchSubject(subjectNameTf.getText())) {
                     JOptionPane.showMessageDialog(this, "Subject Already Exist !!");
-                }
-                else{
-                    
-                    admin.addSubject(subjectNameTf.getText(),Integer.parseInt(subjectCreditsCb.getSelectedItem().toString()));
+                } else {
+
+                    admin.addSubject(subjectNameTf.getText(), Integer.parseInt(subjectCreditsCb.getSelectedItem().toString()));
                     JOptionPane.showMessageDialog(this, "Subject Successfuly Created");
-                    ResultSet rs=JdbcSingleton.getInstance().getSubject(subjectNameTf.getText());
-                    DefaultTableModel model=(DefaultTableModel)jTable1.getModel();
-                    while(rs.next()){
-                    model.addRow(new Object[]{rs.getString("subjectId"),rs.getString("name"),rs.getString("credits")});
+                    ResultSet rs = JdbcSingleton.getInstance().getSubject(subjectNameTf.getText());
+                    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                    while (rs.next()) {
+                        model.addRow(new Object[]{rs.getString("subjectId"), rs.getString("name"), rs.getString("credits")});
                     }
                     clearSubject();
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        else{
+        } else {
             JOptionPane.showMessageDialog(this, "Some Informations are Missing");
         }
     }//GEN-LAST:event_saveSubjectBtnActionPerformed
 
     private void deleteSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSubjectBtnActionPerformed
-        if(jTable1.getSelectedRow()<0){
-           JOptionPane.showMessageDialog(this,"You Didnt Make A Selection !!");
-       }  
-        else{
-        int selectedIndex=jTable1.getSelectedRow();
-        try {
-            admin.deleteSubject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), this);
-            DefaultTableModel model=(DefaultTableModel)jTable1.getModel();
-            model.setRowCount(0);
-            loadSubjectView();
-            clearSubject();
-        } catch (SQLException ex) {
-            Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        if (jTable1.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable1.getSelectedRow();
+            try {
+                admin.deleteSubject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), this);
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.setRowCount(0);
+                loadSubjectView();
+                clearSubject();
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_deleteSubjectBtnActionPerformed
 
     private void editSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editSubjectBtnActionPerformed
-               if(!subjectNameAvailable()||jTable1.getSelectedRow()<0){
-           JOptionPane.showMessageDialog(this,"Some Fields Are Missing Or You Didnt Make A Selection !!");
-       }
-       else{
-           int selectedIndex=jTable1.getSelectedRow();
-           
-           try {
-               admin.updateSubject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), subjectNameTf.getText(), subjectCreditsCb.getSelectedItem().toString(), this);
+        if (!subjectNameAvailable() || jTable1.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Some Fields Are Missing Or You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable1.getSelectedRow();
 
-               DefaultTableModel model=(DefaultTableModel)jTable1.getModel();
-            model.setRowCount(0);
-               loadSubjectView();
-               clearSubject();
-               
-           } catch (SQLException ex) {
-               Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-           }
-       }
+            try {
+                admin.updateSubject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), subjectNameTf.getText(), subjectCreditsCb.getSelectedItem().toString(), this);
+
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.setRowCount(0);
+                loadSubjectView();
+                clearSubject();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_editSubjectBtnActionPerformed
 
     private void clearSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearSubjectBtnActionPerformed
@@ -979,10 +970,10 @@ public class AdminGui extends javax.swing.JFrame {
     }//GEN-LAST:event_clearSubjectBtnActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-         DefaultTableModel model=(DefaultTableModel)jTable1.getModel();
-       int selectedIndex=jTable1.getSelectedRow();
-       subjectNameTf.setText(jTable1.getValueAt(selectedIndex, 1).toString());
-       subjectCreditsCb.setSelectedItem(jTable1.getValueAt(selectedIndex, 2).toString());
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        int selectedIndex = jTable1.getSelectedRow();
+        subjectNameTf.setText(jTable1.getValueAt(selectedIndex, 1).toString());
+        subjectCreditsCb.setSelectedItem(jTable1.getValueAt(selectedIndex, 2).toString());
     }//GEN-LAST:event_jTable1MouseClicked
 
 

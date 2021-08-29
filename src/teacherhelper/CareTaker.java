@@ -13,16 +13,18 @@ import java.util.List;
  * @author ViSion
  */
 public class CareTaker {
-   private List<Memento> mementoList = new ArrayList<Memento>();
 
-   public void add(Memento state){
-      mementoList.add(state);
-   }
+    private List<Memento> mementoList = new ArrayList<Memento>();
 
-   public Memento get(int index){
-      return mementoList.get(index);
-   }
-   public List<Memento> getList(){
-       return this.mementoList;
-   }
+    public void add(Memento state) {
+        mementoList.add(state);
+    }
+
+    public Memento get(int index) {
+        return mementoList.get(index);
+    }
+
+    public List<Memento> getList() {
+        return this.mementoList;
+    }
 }

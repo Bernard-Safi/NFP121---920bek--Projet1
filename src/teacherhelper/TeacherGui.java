@@ -5,11 +5,16 @@
  */
 package teacherhelper;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -22,17 +27,54 @@ public class TeacherGui extends javax.swing.JFrame {
      */
     private Teacher teacher;
     CareTaker careTaker;
+
     public TeacherGui(User user) throws SQLException {
-        teacher=(Teacher)user;
-        careTaker=new CareTaker();
+        teacher = (Teacher) user;
+        careTaker = new CareTaker();
         careTaker.add(teacher.saveStateToMemento());
-        
-        
+
         initComponents();
-        ResultSet rs=JdbcSingleton.getInstance().getALLSubjectNames();
-        while(rs.next()){
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        jTable.setDefaultRenderer(String.class, centerRenderer);
+        jTable.setDefaultEditor(Object.class, null);
+        jTable1.setDefaultRenderer(String.class, centerRenderer);
+        jTable1.setDefaultEditor(Object.class, null);
+
+        ResultSet rs = JdbcSingleton.getInstance().getALLSubjectNames();
+        while (rs.next()) {
             subjectsCb.addItem(rs.getString("name"));
+            submissionsSubjectCb.addItem(rs.getString("name"));
         }
+        rs = JdbcSingleton.getInstance().getChosenSubjectsNames(teacher.getId());
+        while (rs.next()) {
+            subjectCb.addItem(rs.getString("name"));
+        }
+        loadView();
+        loadProjectsView();
+    }
+
+    public boolean allInfoAvailable() {
+        return (!(subjectCb.getSelectedItem().toString().equals("") || nameTf.getText().equals("") || dueDateTf.getText().equals("") || projectLinkTf.getText().equals("")));
+    }
+
+    public void loadView() throws SQLException {
+        jTable.setModel(JdbcSingleton.getInstance().getChosenSubjects(teacher.getId(), jTable.getModel()));
+    }
+
+    public void loadProjectsView() throws SQLException {
+
+        if (subjectCb.getSelectedIndex() != -1) {
+
+            JdbcSingleton.getInstance().getSubjectProjects(subjectCb.getSelectedItem().toString(), jTable1.getModel());
+        }
+    }
+
+    public void clear() {
+        subjectCb.setSelectedIndex(0);
+        nameTf.setText("");
+        dueDateTf.setText("");
+        projectLinkTf.setText("");
     }
 
     /**
@@ -55,18 +97,28 @@ public class TeacherGui extends javax.swing.JFrame {
         addSubjectBtn = new javax.swing.JButton();
         removeSubjectBtn = new javax.swing.JButton();
         addProjectPnl = new javax.swing.JPanel();
-        subjectInfoPnl = new javax.swing.JPanel();
-        subjectNameLbl = new javax.swing.JLabel();
-        subjectNameTf = new javax.swing.JTextField();
-        subjectCreditsLbl = new javax.swing.JLabel();
-        subjectCreditsCb = new javax.swing.JComboBox<>();
-        subjectCreationLbl = new javax.swing.JLabel();
+        projectInfoPnl = new javax.swing.JPanel();
+        subjectLbl = new javax.swing.JLabel();
+        subjectCb = new javax.swing.JComboBox<>();
+        nameLbl = new javax.swing.JLabel();
+        nameTf = new javax.swing.JTextField();
+        dueDateLbl = new javax.swing.JLabel();
+        dueDateTf = new javax.swing.JTextField();
+        projectLinkLbl = new javax.swing.JLabel();
+        projectLinkTf = new javax.swing.JTextField();
+        addProjectBtn = new javax.swing.JButton();
+        editProjectBtn = new javax.swing.JButton();
+        removeProjectBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        saveSubjectBtn = new javax.swing.JButton();
-        deleteSubjectBtn = new javax.swing.JButton();
-        editSubjectBtn = new javax.swing.JButton();
-        clearSubjectBtn = new javax.swing.JButton();
+        addProjectLbl = new javax.swing.JLabel();
+        submissionsPnl = new javax.swing.JPanel();
+        submissionsInfoPnl = new javax.swing.JPanel();
+        submissionsSubjectLbl = new javax.swing.JLabel();
+        submissionsSubjectCb = new javax.swing.JComboBox<>();
+        submissionsLbl = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
         projectCorrectionPnl = new javax.swing.JPanel();
         editProfilePnl = new javax.swing.JPanel();
         profilePnl = new javax.swing.JPanel();
@@ -154,9 +206,19 @@ public class TeacherGui extends javax.swing.JFrame {
 
         addSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         addSubjectBtn.setText("ADD SUBJECT");
+        addSubjectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addSubjectBtnActionPerformed(evt);
+            }
+        });
 
         removeSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         removeSubjectBtn.setText("REMOVE SUBJECT");
+        removeSubjectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeSubjectBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout chooseSubjectPnlLayout = new javax.swing.GroupLayout(chooseSubjectPnl);
         chooseSubjectPnl.setLayout(chooseSubjectPnlLayout);
@@ -172,7 +234,7 @@ public class TeacherGui extends javax.swing.JFrame {
                         .addComponent(addSubjectBtn)
                         .addGap(53, 53, 53)
                         .addComponent(removeSubjectBtn)))
-                .addContainerGap(633, Short.MAX_VALUE))
+                .addContainerGap(655, Short.MAX_VALUE))
             .addGroup(chooseSubjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(chooseSubjectPnlLayout.createSequentialGroup()
                     .addGroup(chooseSubjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,7 +251,7 @@ public class TeacherGui extends javax.swing.JFrame {
             .addGroup(chooseSubjectPnlLayout.createSequentialGroup()
                 .addGap(49, 49, 49)
                 .addComponent(subjectsPnl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(chooseSubjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addSubjectBtn)
                     .addComponent(removeSubjectBtn))
@@ -200,87 +262,128 @@ public class TeacherGui extends javax.swing.JFrame {
                     .addComponent(chooseSubjectsLbl)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(jScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(57, Short.MAX_VALUE)))
+                    .addContainerGap(68, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("Choose Subjects", chooseSubjectPnl);
 
-        subjectInfoPnl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        subjectInfoPnl.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        projectInfoPnl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        subjectNameLbl.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
-        subjectNameLbl.setText("Name");
+        subjectLbl.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        subjectLbl.setText("Subject");
 
-        subjectNameTf.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        subjectCb.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        subjectCb.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                subjectCbItemStateChanged(evt);
+            }
+        });
 
-        subjectCreditsLbl.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
-        subjectCreditsLbl.setText("Credits");
+        nameLbl.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        nameLbl.setText("Name");
 
-        subjectCreditsCb.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
-        subjectCreditsCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "3", "4", "5", "6" }));
+        nameTf.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
 
-        javax.swing.GroupLayout subjectInfoPnlLayout = new javax.swing.GroupLayout(subjectInfoPnl);
-        subjectInfoPnl.setLayout(subjectInfoPnlLayout);
-        subjectInfoPnlLayout.setHorizontalGroup(
-            subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subjectInfoPnlLayout.createSequentialGroup()
-                .addGap(46, 46, 46)
-                .addGroup(subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(subjectNameLbl)
-                    .addComponent(subjectCreditsLbl))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(subjectNameTf)
-                    .addComponent(subjectCreditsCb, 0, 192, Short.MAX_VALUE))
-                .addGap(45, 45, 45))
+        dueDateLbl.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        dueDateLbl.setText("Due Date");
+
+        dueDateTf.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+
+        projectLinkLbl.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        projectLinkLbl.setText("Project Link");
+
+        projectLinkTf.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+
+        javax.swing.GroupLayout projectInfoPnlLayout = new javax.swing.GroupLayout(projectInfoPnl);
+        projectInfoPnl.setLayout(projectInfoPnlLayout);
+        projectInfoPnlLayout.setHorizontalGroup(
+            projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(projectInfoPnlLayout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(subjectLbl)
+                    .addComponent(nameLbl)
+                    .addComponent(dueDateLbl)
+                    .addComponent(projectLinkLbl))
+                .addGap(54, 54, 54)
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(subjectCb, 0, 192, Short.MAX_VALUE)
+                    .addComponent(nameTf)
+                    .addComponent(dueDateTf)
+                    .addComponent(projectLinkTf))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
-        subjectInfoPnlLayout.setVerticalGroup(
-            subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subjectInfoPnlLayout.createSequentialGroup()
+        projectInfoPnlLayout.setVerticalGroup(
+            projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(projectInfoPnlLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(subjectLbl)
+                    .addComponent(subjectCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(52, 52, 52)
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(nameLbl)
+                    .addComponent(nameTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(48, 48, 48)
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(dueDateLbl)
+                    .addComponent(dueDateTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(44, 44, 44)
-                .addGroup(subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(subjectNameLbl)
-                    .addComponent(subjectNameTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
-                .addGroup(subjectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(subjectCreditsLbl)
-                    .addComponent(subjectCreditsCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(78, 78, 78))
+                .addGroup(projectInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(projectLinkLbl)
+                    .addComponent(projectLinkTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
-        subjectCreationLbl.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        subjectCreationLbl.setText("SUBJECT CREATION");
+        addProjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        addProjectBtn.setText("ADD");
+        addProjectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addProjectBtnActionPerformed(evt);
+            }
+        });
 
-        jTable1.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        editProjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        editProjectBtn.setText("EDIT");
+        editProjectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editProjectBtnActionPerformed(evt);
+            }
+        });
+
+        removeProjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        removeProjectBtn.setText("REMOVE");
+        removeProjectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeProjectBtnActionPerformed(evt);
+            }
+        });
+
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "ID", "NAME", "CREDITS"
+                "ID", "NAME", "DUE DATE", "PROJECT LINK"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
-        saveSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        saveSubjectBtn.setText("SAVE");
-
-        deleteSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        deleteSubjectBtn.setText("DELETE");
-
-        editSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        editSubjectBtn.setText("EDIT");
-
-        clearSubjectBtn.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
-        clearSubjectBtn.setText("CLEAR");
+        addProjectLbl.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        addProjectLbl.setText("ADD PROJECT");
 
         javax.swing.GroupLayout addProjectPnlLayout = new javax.swing.GroupLayout(addProjectPnl);
         addProjectPnl.setLayout(addProjectPnlLayout);
@@ -289,53 +392,133 @@ public class TeacherGui extends javax.swing.JFrame {
             .addGroup(addProjectPnlLayout.createSequentialGroup()
                 .addGroup(addProjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(addProjectPnlLayout.createSequentialGroup()
-                        .addGap(57, 57, 57)
-                        .addComponent(subjectCreationLbl))
+                        .addGap(53, 53, 53)
+                        .addComponent(projectInfoPnl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(62, 62, 62)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(addProjectPnlLayout.createSequentialGroup()
-                        .addGap(33, 33, 33)
-                        .addGroup(addProjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(addProjectPnlLayout.createSequentialGroup()
-                                .addComponent(saveSubjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(deleteSubjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(editSubjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(clearSubjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(subjectInfoPnl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(85, 85, 85)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(26, Short.MAX_VALUE))
+                        .addGap(77, 77, 77)
+                        .addComponent(addProjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(40, 40, 40)
+                        .addComponent(editProjectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(44, 44, 44)
+                        .addComponent(removeProjectBtn))
+                    .addGroup(addProjectPnlLayout.createSequentialGroup()
+                        .addGap(106, 106, 106)
+                        .addComponent(addProjectLbl)))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
         addProjectPnlLayout.setVerticalGroup(
             addProjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addProjectPnlLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(subjectCreationLbl)
-                .addGap(18, 18, 18)
+            .addGroup(addProjectPnlLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(addProjectLbl)
+                .addGap(26, 26, 26)
                 .addGroup(addProjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(subjectInfoPnl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                    .addComponent(projectInfoPnl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(addProjectPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(saveSubjectBtn)
-                    .addComponent(deleteSubjectBtn)
-                    .addComponent(editSubjectBtn)
-                    .addComponent(clearSubjectBtn))
-                .addGap(24, 24, 24))
+                    .addComponent(editProjectBtn)
+                    .addComponent(removeProjectBtn)
+                    .addComponent(addProjectBtn))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Add Projects", addProjectPnl);
+        jTabbedPane1.addTab("Add Project", addProjectPnl);
+
+        submissionsInfoPnl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        submissionsSubjectLbl.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        submissionsSubjectLbl.setText("Subjects");
+
+        submissionsSubjectCb.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        submissionsSubjectCb.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                submissionsSubjectCbItemStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout submissionsInfoPnlLayout = new javax.swing.GroupLayout(submissionsInfoPnl);
+        submissionsInfoPnl.setLayout(submissionsInfoPnlLayout);
+        submissionsInfoPnlLayout.setHorizontalGroup(
+            submissionsInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(submissionsInfoPnlLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(submissionsSubjectLbl)
+                .addGap(18, 18, 18)
+                .addComponent(submissionsSubjectCb, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(43, Short.MAX_VALUE))
+        );
+        submissionsInfoPnlLayout.setVerticalGroup(
+            submissionsInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(submissionsInfoPnlLayout.createSequentialGroup()
+                .addGap(136, 136, 136)
+                .addGroup(submissionsInfoPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(submissionsSubjectLbl)
+                    .addComponent(submissionsSubjectCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(140, Short.MAX_VALUE))
+        );
+
+        submissionsLbl.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        submissionsLbl.setText("SUBMISSIONS");
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "PROJECT ID", "USER ID", "SUBMISSION DATE", "SUBMISSION LINK"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(jTable2);
+
+        javax.swing.GroupLayout submissionsPnlLayout = new javax.swing.GroupLayout(submissionsPnl);
+        submissionsPnl.setLayout(submissionsPnlLayout);
+        submissionsPnlLayout.setHorizontalGroup(
+            submissionsPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(submissionsPnlLayout.createSequentialGroup()
+                .addGap(130, 130, 130)
+                .addComponent(submissionsLbl)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, submissionsPnlLayout.createSequentialGroup()
+                .addContainerGap(75, Short.MAX_VALUE)
+                .addComponent(submissionsInfoPnl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 646, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29))
+        );
+        submissionsPnlLayout.setVerticalGroup(
+            submissionsPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(submissionsPnlLayout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(submissionsLbl)
+                .addGap(18, 18, 18)
+                .addGroup(submissionsPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(submissionsInfoPnl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(60, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Submissions", submissionsPnl);
 
         javax.swing.GroupLayout projectCorrectionPnlLayout = new javax.swing.GroupLayout(projectCorrectionPnl);
         projectCorrectionPnl.setLayout(projectCorrectionPnlLayout);
         projectCorrectionPnlLayout.setHorizontalGroup(
             projectCorrectionPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1098, Short.MAX_VALUE)
+            .addGap(0, 1120, Short.MAX_VALUE)
         );
         projectCorrectionPnlLayout.setVerticalGroup(
             projectCorrectionPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 433, Short.MAX_VALUE)
+            .addGap(0, 444, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Project Correction", projectCorrectionPnl);
@@ -430,7 +613,7 @@ public class TeacherGui extends javax.swing.JFrame {
                     .addGroup(editProfilePnlLayout.createSequentialGroup()
                         .addGap(484, 484, 484)
                         .addComponent(editProfileBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         editProfilePnlLayout.setVerticalGroup(
             editProfilePnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -440,7 +623,7 @@ public class TeacherGui extends javax.swing.JFrame {
                 .addGap(28, 28, 28)
                 .addComponent(profilePnl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(editProfileBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                .addComponent(editProfileBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
                 .addGap(24, 24, 24))
         );
 
@@ -539,7 +722,7 @@ public class TeacherGui extends javax.swing.JFrame {
                         .addComponent(confirmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(75, 75, 75)
                         .addComponent(undoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addContainerGap(210, Short.MAX_VALUE))
         );
         changePasswordPnlLayout.setVerticalGroup(
             changePasswordPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -552,7 +735,7 @@ public class TeacherGui extends javax.swing.JFrame {
                 .addGroup(changePasswordPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(undoBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(confirmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Change Password", changePasswordPnl);
@@ -561,11 +744,11 @@ public class TeacherGui extends javax.swing.JFrame {
         logoutPnl.setLayout(logoutPnlLayout);
         logoutPnlLayout.setHorizontalGroup(
             logoutPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1098, Short.MAX_VALUE)
+            .addGap(0, 1120, Short.MAX_VALUE)
         );
         logoutPnlLayout.setVerticalGroup(
             logoutPnlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 433, Short.MAX_VALUE)
+            .addGap(0, 444, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Logout", logoutPnl);
@@ -587,30 +770,30 @@ public class TeacherGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-        
-        if(jTabbedPane1.getSelectedIndex()==3){
-          try {
-              
-              ResultSet rs=JdbcSingleton.getInstance().loadProfile(teacher);
-              while(rs.next()){
-                  nameEditTf.setText(rs.getString("name"));
-                  lastNameEditTf.setText(rs.getString("lastname"));
-                  phoneEditTf.setText(rs.getString("phone"));
-                  userNameEditTf.setText(rs.getString("username"));
-              }
-          } catch (SQLException ex) {
-              Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
-          }
-      }
-      
-        if(jTabbedPane1.getSelectedIndex()==5){
-          teacher.logout(this);
-      }
-      
+
+        if (jTabbedPane1.getSelectedIndex() == 4) {
+            try {
+
+                ResultSet rs = JdbcSingleton.getInstance().loadProfile(teacher);
+                while (rs.next()) {
+                    nameEditTf.setText(rs.getString("name"));
+                    lastNameEditTf.setText(rs.getString("lastname"));
+                    phoneEditTf.setText(rs.getString("phone"));
+                    userNameEditTf.setText(rs.getString("username"));
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (jTabbedPane1.getSelectedIndex() == 6) {
+            teacher.logout(this);
+        }
+
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private void editProfileBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProfileBtnActionPerformed
-               try {
+        try {
             teacher.editProfile(teacher, nameEditTf.getText(), lastNameEditTf.getText(), phoneEditTf.getText(), userNameEditTf.getText(), this);
             teacher.setName(nameEditTf.getText());
             teacher.setLastName(lastNameEditTf.getText());
@@ -622,25 +805,21 @@ public class TeacherGui extends javax.swing.JFrame {
     }//GEN-LAST:event_editProfileBtnActionPerformed
 
     private void confirmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmBtnActionPerformed
-        if(oldPassTf.getText()==""||newPassTf.getText()==""||confirmPassTf.getText()==""){
+        if (oldPassTf.getText() == "" || newPassTf.getText() == "" || confirmPassTf.getText() == "") {
             JOptionPane.showMessageDialog(this, "Some Fields Are Missing !!");
-        }
-        else{
+        } else {
             try {
-                if(!JdbcSingleton.getInstance().verifyOldPassword(teacher, oldPassTf.getText())){
+                if (!JdbcSingleton.getInstance().verifyOldPassword(teacher, oldPassTf.getText())) {
                     JOptionPane.showMessageDialog(this, "Wrong Old Password !!");
-                }
-                else{
-                    
-                    if(!newPassTf.getText().equals(confirmPassTf.getText())){
+                } else {
+
+                    if (!newPassTf.getText().equals(confirmPassTf.getText())) {
                         JOptionPane.showMessageDialog(this, "New Pass And Confirmation Are Not The Same !!");
-                    }
-                    else{
+                    } else {
                         teacher.changePassword(teacher, newPassTf.getText(), this);
                         teacher.setPassword(newPassTf.getText());
                         careTaker.add(teacher.saveStateToMemento());
-                        
-                        
+
                     }
                 }
             } catch (SQLException ex) {
@@ -650,50 +829,201 @@ public class TeacherGui extends javax.swing.JFrame {
     }//GEN-LAST:event_confirmBtnActionPerformed
 
     private void undoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoBtnActionPerformed
-         if(careTaker.getList().size()>1){
+        if (careTaker.getList().size() > 1) {
             try {
-                teacher.changePassword(teacher,careTaker.get(careTaker.getList().size()-2).getState(), this);
+                teacher.changePassword(teacher, careTaker.get(careTaker.getList().size() - 2).getState(), this);
             } catch (SQLException ex) {
                 Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            teacher.setPassword(careTaker.get(careTaker.getList().size()-2).getState());
-            
-            careTaker.getList().remove(careTaker.getList().size()-1);
-        }
-        else{
+
+            teacher.setPassword(careTaker.get(careTaker.getList().size() - 2).getState());
+
+            careTaker.getList().remove(careTaker.getList().size() - 1);
+        } else {
             JOptionPane.showMessageDialog(this, "There Is Nothing To Undo !!");
         }
     }//GEN-LAST:event_undoBtnActionPerformed
 
+    private void addSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSubjectBtnActionPerformed
+        if (subjectsCb.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Please Choose A Subject First");
+        } else {
+            try {
+                if (JdbcSingleton.getInstance().searchChosenSubject(subjectsCb.getSelectedItem().toString(), teacher.getId())) {
+                    JOptionPane.showMessageDialog(this, "Subject Already Chosen In You List !!");
+                } else {
+
+                    try {
+                        int subjectId = 0;
+                        ResultSet rs = JdbcSingleton.getInstance().getSubjectId(subjectsCb.getSelectedItem().toString());
+                        while (rs.next()) {
+                            subjectId = rs.getInt("subjectId");
+                        }
+                        teacher.SubjectChoice(teacher.getId(), subjectId);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    JOptionPane.showMessageDialog(this, "Subject succesfuly added to your subject list");
+                    DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+                    model.setRowCount(0);
+                    loadView();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_addSubjectBtnActionPerformed
+
+    private void removeSubjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeSubjectBtnActionPerformed
+        if (jTable.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable.getSelectedRow();
+            try {
+                teacher.subjectRemove(teacher.getId(), Integer.parseInt(jTable.getValueAt(selectedIndex, 0).toString()), this);
+                DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+                model.setRowCount(0);
+                loadView();
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_removeSubjectBtnActionPerformed
+
+    private void addProjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProjectBtnActionPerformed
+        if (allInfoAvailable()) {
+            try {
+                if (JdbcSingleton.getInstance().searchChosenProject(nameTf.getText())) {
+                    JOptionPane.showMessageDialog(this, "Project Name Already Exist !!");
+                } else {
+                    ResultSet rs = JdbcSingleton.getInstance().getSubjectId(subjectCb.getSelectedItem().toString());
+                    int subjectId = 0;
+                    while (rs.next()) {
+                        subjectId = rs.getInt("subjectId");
+                    }
+                    teacher.addProject(subjectId, nameTf.getText(), dueDateTf.getText(), projectLinkTf.getText());
+                    JOptionPane.showMessageDialog(this, "Project Successfuly Added");
+                    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                    model.setRowCount(0);
+                    loadProjectsView();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Some Informations Are Missing !!");
+        }
+    }//GEN-LAST:event_addProjectBtnActionPerformed
+
+    private void subjectCbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_subjectCbItemStateChanged
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        try {
+            loadProjectsView();
+        } catch (SQLException ex) {
+            Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_subjectCbItemStateChanged
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        int selectedIndex = jTable1.getSelectedRow();
+
+        nameTf.setText(jTable1.getValueAt(selectedIndex, 1).toString());
+        dueDateTf.setText(jTable1.getValueAt(selectedIndex, 2).toString());
+        projectLinkTf.setText(jTable1.getValueAt(selectedIndex, 3).toString());
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void editProjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProjectBtnActionPerformed
+        if (!allInfoAvailable() || jTable1.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Some Fields Are Missing Or You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable1.getSelectedRow();
+
+            try {
+                teacher.editProject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), nameTf.getText(), dueDateTf.getText(), projectLinkTf.getText(), this);
+
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.setRowCount(0);
+                loadProjectsView();
+                clear();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_editProjectBtnActionPerformed
+
+    private void removeProjectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeProjectBtnActionPerformed
+        if (jTable1.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "You Didnt Make A Selection !!");
+        } else {
+            int selectedIndex = jTable1.getSelectedRow();
+            try {
+                teacher.removeProject(Integer.parseInt(jTable1.getValueAt(selectedIndex, 0).toString()), this);
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.setRowCount(0);
+                loadProjectsView();
+                clear();
+            } catch (SQLException ex) {
+                Logger.getLogger(AdminGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_removeProjectBtnActionPerformed
+
+    private void submissionsSubjectCbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_submissionsSubjectCbItemStateChanged
+//        if(submissionsSubjectCb.getSelectedIndex()!=-1){
+//            try {
+//                int subjectId=0;
+//                ResultSet rs=JdbcSingleton.getInstance().getSubjectId(submissionsSubjectCb.getSelectedItem().toString());
+//                while(rs.next()){
+//                    subjectId=rs.getInt("subjectId");
+//                }
+//                try {
+//                    JdbcSingleton.getInstance().getSubmissionsBySubjectId(subjectId,jTable2.getModel());
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } catch (SQLException ex) {
+//                Logger.getLogger(TeacherGui.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+    }//GEN-LAST:event_submissionsSubjectCbItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addProjectBtn;
+    private javax.swing.JLabel addProjectLbl;
     private javax.swing.JPanel addProjectPnl;
     private javax.swing.JButton addSubjectBtn;
     private javax.swing.JLabel changePasswordLbl;
     private javax.swing.JPanel changePasswordPnl;
     private javax.swing.JPanel chooseSubjectPnl;
     private javax.swing.JLabel chooseSubjectsLbl;
-    private javax.swing.JButton clearSubjectBtn;
     private javax.swing.JButton confirmBtn;
     private javax.swing.JLabel confirmPassLbl;
     private javax.swing.JTextField confirmPassTf;
-    private javax.swing.JButton deleteSubjectBtn;
+    private javax.swing.JLabel dueDateLbl;
+    private javax.swing.JTextField dueDateTf;
     private javax.swing.JButton editProfileBtn;
     private javax.swing.JLabel editProfileLbl;
     private javax.swing.JPanel editProfilePnl;
-    private javax.swing.JButton editSubjectBtn;
+    private javax.swing.JButton editProjectBtn;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     private javax.swing.JLabel lastNameEditLbl;
     private javax.swing.JTextField lastNameEditTf;
     private javax.swing.JPanel logoutPnl;
     private javax.swing.JLabel nameEditLbl;
     private javax.swing.JTextField nameEditTf;
+    private javax.swing.JLabel nameLbl;
+    private javax.swing.JTextField nameTf;
     private javax.swing.JLabel newPassLbl;
     private javax.swing.JTextField newPassTf;
     private javax.swing.JLabel oldPassLbl;
@@ -703,17 +1033,21 @@ public class TeacherGui extends javax.swing.JFrame {
     private javax.swing.JTextField phoneEditTf;
     private javax.swing.JPanel profilePnl;
     private javax.swing.JPanel projectCorrectionPnl;
+    private javax.swing.JPanel projectInfoPnl;
+    private javax.swing.JLabel projectLinkLbl;
+    private javax.swing.JTextField projectLinkTf;
+    private javax.swing.JButton removeProjectBtn;
     private javax.swing.JButton removeSubjectBtn;
-    private javax.swing.JButton saveSubjectBtn;
-    private javax.swing.JLabel subjectCreationLbl;
-    private javax.swing.JComboBox<String> subjectCreditsCb;
-    private javax.swing.JLabel subjectCreditsLbl;
-    private javax.swing.JPanel subjectInfoPnl;
-    private javax.swing.JLabel subjectNameLbl;
-    private javax.swing.JTextField subjectNameTf;
+    private javax.swing.JComboBox<String> subjectCb;
+    private javax.swing.JLabel subjectLbl;
     private javax.swing.JComboBox<String> subjectsCb;
     private javax.swing.JLabel subjectsLbl;
     private javax.swing.JPanel subjectsPnl;
+    private javax.swing.JPanel submissionsInfoPnl;
+    private javax.swing.JLabel submissionsLbl;
+    private javax.swing.JPanel submissionsPnl;
+    private javax.swing.JComboBox<String> submissionsSubjectCb;
+    private javax.swing.JLabel submissionsSubjectLbl;
     private javax.swing.JButton undoBtn;
     private javax.swing.JLabel userNameEditLbl;
     private javax.swing.JTextField userNameEditTf;
